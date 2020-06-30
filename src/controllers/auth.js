@@ -6,19 +6,27 @@ const router =express.Router()
 const saltRounds = 10
 
 //fazer login
-router.get('/sing-in', (req, res) => {
+router.get('/sign-in', (req, res) => {
     return res.json('Sing in')
 })
 
 //cadastro
-router.get ('/sing-up', async (req, res) =>{
-    const email = "johnny@gmail.com"
-    const password = '123456'
+router.get ('/sign-up', async (req, res) =>{
+    //pegando email e senha 
+    const {email, password} = req.body
 
+    //encontrar itens repetidos no banco de dados nesse caso email
+    const account = await Account.findOne({where: {email}})
+    if(account){
+        return res.json('Account already exists(a conta já existe)')
+    }
+    //const email = "johnny@gmail.com"
+    //const password = '123456'
+
+    //criptografar a senha
     const hash = bcrypt.hashSync(password, saltRounds)
-    console.log(hash)
-    const result = await Account.create({email, password: hash})
-    return res.json(result)
+    const newAccount = await Account.create({email, password: hash})
+    return res.json(newAccount)
 })
 
 //exportar
